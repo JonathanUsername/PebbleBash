@@ -82,21 +82,37 @@ body {
     min-height:200px;
 }
 
-#background {
+#indicator {
+    display: none;
+}
+
+#startGame {
+    display: none;
+}
+
+.fullscreen {
+    color: white;
+    text-align: center;
+    font-size: 22px;
     position: absolute;
     height: 100%;
     width: 100%;
     top: 0;
     left: 0;
-    display: none;
-    color: white;
-    text-align: center;
-    font-size: 22px;
-    padding: 20%;
 }
 
-#startGame {
-    display: none;
+.end-image {
+    display:none;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#win-screen {
+    background-image: url(https://i.imgur.com/4zd8vo4.jpg);
+}
+
+#lose-screen {
+    background-image: url(http://cdn.hexjam.com/editorial_service/bases/images/000/003/685/xlarge/David-Cameron-Sad.jpg.jpg?1404131443);
 }
 
 .loser {

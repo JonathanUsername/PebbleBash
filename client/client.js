@@ -2,7 +2,7 @@ const LIMIT = 5;
 
 const socket = io();
 const out = $('#console')[0];
-const bg = $('#background');
+const indicator = $('#indicator');
 
 if (!window.DeviceMotionEvent) {
   alert('Device motion is not supported! You can\'t have any fun, sorry.');
@@ -16,6 +16,7 @@ $('#newGame').click(newGame);
 $('#joinGame').click(joinGame);
 $('#startGame').click(startGame);
 $('#lose').click(lose);
+$('.playAgain').click(playAgain);
 
 function send (url, data) {
   const params = data ? data : {};
@@ -59,6 +60,12 @@ function joinGame () {
   $('gameId').val();
 }
 
+function playAgain () {
+  $('.starting-info').show();
+  $('#win-screen').hide();
+  $('#lose-screen').hide();
+}
+
 function startGame () {
 
   // const name = $('#name').val();
@@ -67,15 +74,29 @@ function startGame () {
 
   window.addEventListener('devicemotion', listener, false);
 
-  bg.addClass('alive').show();
+  indicator.addClass('alive').show();
 
   socket.on('gameover', data => {
     window.removeEventListener('devicemotion', listener, false)
     console.log(data)
     console.log(socket.id)
-    var winner = data.winnerId === socket.id ? 'YOU' : data.winner;
-    alert(`Game over! The winner was: ${winner}`);
+    var winner = data.winner;
+    var won = isWinner(data);
+    if (won) {
+      winner = 'YOU';
+      $('#win-screen').show();
+    } else {
+      $('#lose-screen').show();
+    }
+    indicator.removeClass('alive')
+      .removeClass('loser')
+      .text('')
+      .hide();
   })
+}
+
+function isWinner(data) {
+  return data.winnerId === socket.id
 }
 
 
@@ -101,7 +122,7 @@ function overTheLimit(coord) {
 
 function lose() {
   window.removeEventListener('devicemotion', listener, false);
-  bg.removeClass('alive').addClass('loser').text('LOSER');
+  indicator.removeClass('alive').addClass('loser').text('LOSER');
   socket.emit('loser', {
     id: socket.id
   })
