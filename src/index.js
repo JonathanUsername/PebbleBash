@@ -31,9 +31,12 @@ server.register(require('inert'), (err) => {
     handler: function (request, reply) {
       const gameName = request.params.gameName;
       const playerId = request.payload.playerId
+      const playerName = request.payload.name
 
       logger.info(`Requested game ${playerId}`);
       const player = getPlayer(playerId)
+
+      player.name = playerName;
 
       if (gameName === 'new') {
         const room = new Room().addPlayer(player)

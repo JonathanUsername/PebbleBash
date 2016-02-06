@@ -44,10 +44,10 @@ class Room {
     const winners = this.players.filter(i => !i.lost)
     if (winners.length === 1) {
       const winner = winners[0];
-      console.log(`${winner} won!`)
+      console.log(`${winner.name} won!`)
       winner.win();
       this.stop({
-        winner: winner.name // undefined FIXME;
+        winner: winner
       });
     } else if (winners.length === 0) {
       console.log('Nobody won!')
@@ -74,11 +74,14 @@ class Room {
   stop(data) {
     _.each(this.players, player => {
       console.log(`Telling ${player.id} it's gameover`)
+      
+      // Be careful not to emit circular objects
       player.tell({
         type: 'gameover',
         roomId: this.roomId,
         players: this.players.map(p => p.id),
-        winner: data.winner
+        winner: data.winner.name,
+        winnerId: data.winner.id
       })
     })
     this.started = false;

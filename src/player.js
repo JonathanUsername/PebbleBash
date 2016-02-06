@@ -39,7 +39,7 @@ class Player {
   }
 
   tell(data) {
-    console.log(data.type, this.socket)
+    console.log(data.type, this.name)
     this.socket.emit(data.type, data);
     return this;
   }

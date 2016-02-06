@@ -8,8 +8,8 @@ if (!window.DeviceMotionEvent) {
   alert('Device motion is not supported! You can\'t have any fun, sorry.');
 }
 
-if (localStorage.gameName) {
-  $('gameId').val(localStorage.gameName);
+if (localStorage.name) {
+  $('#name').val(localStorage.name);
 }
 
 $('#newGame').click(newGame);
@@ -19,7 +19,13 @@ $('#lose').click(lose);
 
 function send (url, data) {
   const params = data ? data : {};
+
+  const name = $('#name').val();
+  localStorage.name = name;
+
+  params.name = name;
   params.playerId = socket.id;
+
   return $.ajax(url, {
     method: 'POST',
     data: params
@@ -65,7 +71,10 @@ function startGame () {
 
   socket.on('gameover', data => {
     window.removeEventListener('devicemotion', listener, false)
-    alert('game over!', JSON.stringify(data));
+    console.log(data)
+    console.log(socket.id)
+    var winner = data.winnerId === socket.id ? 'YOU' : data.winner;
+    alert(`Game over! The winner was: ${winner}`);
   })
 }
 
