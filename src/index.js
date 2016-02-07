@@ -29,7 +29,7 @@ server.register(require('inert'), (err) => {
     method: 'POST',
     path: '/room/{gameName}',
     handler: function (request, reply) {
-      const gameName = request.params.gameName;
+      const gameName = request.params.gameName.toLowerCase().trim();
       const playerId = request.payload.playerId
       const playerName = request.payload.name
 

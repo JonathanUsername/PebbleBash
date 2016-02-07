@@ -3,33 +3,39 @@
 <head>
     <title>Pebble Bash</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
     <link rel='stylesheet' href='styles.css' >
 </head>
 <body>
 
 <div class='starting-info'>
 
-  <h1>Pebble Bash</h1>
-
-  <div>
-  	<p>This is a game where the objective is to get your opponents to end up jogging/moving their phone too sharply. If they do, their screen goes red and they lose. The last player standing is declared the winner.</p>
+  <div class="description">
+    <h1>Pebble Bash</h1>
+    
+    <div>
+      <p>This is a game where the objective is to get your opponents to end up jogging/moving their phone too sharply. If they do, their screen goes red and they lose. The last player standing is declared the winner.</p>
+    </div>
   </div>
 
-  <input name="name" id="name" type="text" placeholder="Your Name" value="">
-
-  <div>
-    <input name="gameId" id="gameId" type="text" placeholder="Game ID" value="">
-    <div id='joinGame' class='button'>Join Game</div>
+  <div class="game-start-controls">
+    <input name="name" id="name" type="text" placeholder="Your Name" value="">
+    <div class="half-panel">
+      <input name="gameId" id="gameId" type="text" placeholder="Game ID" value="">
+      <div id='joinGame' class='button'>Join Game</div>
+    </div>
+    
+    <div class="half-panel">
+      <div id='newGame' class='button'>New Game</div>
+    </div>
   </div>
-
-  <div id='newGame' class='button'>New Game</div>
 
 </div>
 
-<div id='startGame' class='button'>Start Game</div>
-
-<div id="console"> </div>
-
+<div class="waiting">
+  <div id='startGame' class='button'>Start Game</div>
+  <div id="gameName"> </div>
+</div>
 
 <div id='indicator' class='fullscreen'>
   <div id='lose' class='button'>LOSE</div> 

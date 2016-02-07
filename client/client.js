@@ -38,9 +38,9 @@ function newGame () {
   send(url)
     .done(data => {
       $('.starting-info').hide();
-      $('#console').text(`Your game name is: ${data.roomId}`)
+      $('#gameName').text(`Your game name is: ${data.roomId}`)
       localStorage.gameName = data.roomId;
-      $('#startGame').show();
+      $('.waiting').show();
     })
 }
 
@@ -54,7 +54,7 @@ function joinGame () {
         $('.starting-info').hide();
         $('#console').text(`Your game name is: ${data.roomId}`)
         localStorage.gameName = data.roomId;
-        $('#startGame').show();
+        $('.waiting').show();
       }
     })
   $('gameId').val();
@@ -64,6 +64,8 @@ function playAgain () {
   $('.starting-info').show();
   $('#win-screen').hide();
   $('#lose-screen').hide();
+  $('#gameName').text('');
+  $('.waiting').hide();
 }
 
 function startGame () {
