@@ -20,17 +20,21 @@ app.factory('Player', function (
   };
 
   Player.joinRoom = (roomId) => {
-    Player.room = roomId;
     console.log('emitting join', roomId)
+    Player.room = roomId;
     socket.emit('join', Player)
-  }
+  };
+
+  Player.saveName = () => {
+    localStorage.playerName = Player.name;
+  };
 
   socket.on('connect', () => {
     console.log('socket connected');
     Player.id = socket.getId();
     loading.finish();
     if ($stateParams.roomId) {
-      console.log('stateparams exists so joining')
+      console.log('stateparams exists so joining');
       Player.joinRoom($stateParams.roomId);
     }
     connectedPromise.resolve(Player.id);

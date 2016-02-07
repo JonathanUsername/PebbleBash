@@ -36,12 +36,13 @@ app.controller('roomCtrl',
 
     $scope.ready = () => {
       if (Player.name && $scope.roomJoined) {
+        Player.saveName();
         socket.emit('ready', {
           roomId: $scope.roomJoined,
           name: Player.name
-        })
+        });
       } else {
-        alert('You have no name? How can you win if you have no name??')
+        alert('You have no name? How can you win if you have no name??');
       }
     };
 

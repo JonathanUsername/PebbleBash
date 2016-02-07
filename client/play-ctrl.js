@@ -1,5 +1,5 @@
 app.controller('playCtrl', 
-  ($scope, $state, $stateParams, socket, Player) => {
+  ($scope, $state, $stateParams, socket, Player, $location) => {
 
     console.log('starting play controller')
 
@@ -7,7 +7,7 @@ app.controller('playCtrl',
     const LIMIT = 5;
 
     // CHANGEME
-    $scope.dev = true;
+    $scope.dev = $location.host() === 'localhost';
 
     $scope.lose = lose;
     $scope.playState = 'alive';
@@ -16,13 +16,16 @@ app.controller('playCtrl',
 
     socket.on('gameover', data => {
       window.removeEventListener('devicemotion', listener, false)
-      console.log('winner id vs yours', data.winner.id, Player.id)
+      if (data.draw) {
+        console.log('you... draw?');
+        return $state.go('base.room.draw');
+      }
       if (data.winner.id === Player.id) {
-        console.log('you win!')
-        $state.go('base.room.win')
+        console.log('you win!');
+        $state.go('base.room.win');
       } else {
-        console.log('you lose!')
-        $state.go('base.room.lose')
+        console.log('you lose!');
+        $state.go('base.room.lose');
       }
     })
 
@@ -50,14 +53,12 @@ app.controller('playCtrl',
       return false;
     }
 
-
-    // For DEV only
     function lose() {
       $scope.playState = 'dead';
       window.removeEventListener('devicemotion', listener, false);
-      window.navigator.vibrate(500);
-      socket.emit('loser')
-      console.log('lost')
+      window.navigator.vibrate(2000);
+      socket.emit('loser');
+      console.log('you lost');
     }
 
   })
@@ -66,6 +67,7 @@ app.controller('endCtrl',
   ($scope, $state, $stateParams, socket) => {
 
     $scope.outcome = $stateParams.outcome;
+    $scope.text = $stateParams.text;
 
     $scope.playAgain = function() {
       socket.emit('play-again');
@@ -87,14 +89,24 @@ angular.module('pebble-bash').config(function (
     .state('base.room.win', {
         controller: 'endCtrl',
         params: {
-          outcome: 'win'
+          outcome: 'win',
+          text: 'WINNAH'
         },
         templateUrl: 'end.html'
       })
     .state('base.room.lose', {
         controller: 'endCtrl',
         params: {
-          outcome: 'lose'
+          outcome: 'lose',
+          text: 'LOOZAH'
+        },
+        templateUrl: 'end.html'
+      })
+    .state('base.room.draw', {
+        controller: 'endCtrl',
+        params: {
+          outcome: 'draw',
+          text: 'It\'s a... draw?'
         },
         templateUrl: 'end.html'
       });

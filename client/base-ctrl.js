@@ -7,7 +7,6 @@ app.controller('baseCtrl',
 
     console.log($state.current.name)
 
-
     $scope.newGame = function() {
       $state.go('base.room', {
         roomId: 'new'
@@ -20,11 +19,15 @@ app.controller('baseCtrl',
 
 angular.module('pebble-bash').config(function (
   $stateProvider,
-  $urlRouterProvider
+  $urlRouterProvider,
+  $urlMatcherFactoryProvider
 ) {
 
   // Default route is base
   $urlRouterProvider.otherwise('/');
+
+  // Allow no trailing slash
+  $urlMatcherFactoryProvider.strictMode(false)
 
   $stateProvider
     .state('base', {

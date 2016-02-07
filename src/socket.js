@@ -100,14 +100,23 @@ function Messenger () {
       function checkWinner() {
         const allPlayers = socketsInRoom(socket.room);
         const stillStanding = allPlayers.filter(i => !i.loser);
+
+        logger.debug(`${stillStanding} in ${socket.room} are left`);
+
         if (stillStanding.length === 1) {
+          const winner = reduceSocketInfo(stillStanding[0])[0];
+          logger.debug(`${winner.name} in ${socket.room} has won`);
           io.sockets.in(socket.room)
             .emit('gameover', {
-              winner: reduceSocketInfo(stillStanding[0])
+              winner: winner
             })
-          _.each(allPlayers, i => i.ready = false)
-          console.log(allPlayers.map(i => i.ready))
+        } else if (stillStanding.length === 0) {
+          io.sockets.in(socket.room)
+            .emit('gameover', {
+              draw: true
+            })
         }
+        _.each(allPlayers, i => i.ready = false)
       }
 
 
@@ -149,9 +158,6 @@ function reduceSocketInfo(arr) {
         id: i.id
       }
     });
-  if (ret.length === 1) {
-    return ret[0]
-  }
   return ret
 }
 

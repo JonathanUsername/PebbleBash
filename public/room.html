@@ -1,24 +1,25 @@
 <div ng-if="$state.current.name === 'base.room'">
-  <div class="waiting">
+  <div class="section">
     <form name="waitingForm">
-        <input ng-model="player.name" required type="text" placeholder="Your Name" name="playerName">
-        <span class="error" ng-show="waitingForm.playerName.$error.required">You have no name? How can you win if you have no name??</span>
-      </form>
+      <p class="label">Your name</p>
+      <input ng-model="player.name" required type="text" placeholder="Your Name" name="playerName">
+      <span class="error" ng-show="waitingForm.playerName.$error.required">What's your name?</span>
+    </form>
+  </div>
+  <div class="section">
     <div ng-click="goBack()" class="button">Back</div>
     <div ng-click="ready()" class="button">Ready?</div>
-    <div>
-      <p>Link to give to your friends:</p>
-      <a ng-href="{{url}}">{{url}}</a>
-    </div>
   </div>
-  
+  <div class="section">
+    <p class="label">Link to give to other players</p>
+    <a ng-href="{{url}}">{{url}}</a>
   </div>
-    <div ng-repeat="other in others">
+  <div class="section">
+    <p class="label">Other players in game</p>
+    <div ng-repeat="other in others" class="other-user">
       <div>Name: {{other.name}}</div>
       <div>Ready: {{other.ready}}</div>
     </div>
   </div>
 </div>
 <div ui-view></div>
-
-

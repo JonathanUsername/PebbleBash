@@ -9,59 +9,8 @@ p {
     font-size: 12px;
 }
 
-#canvas {
-    width: 200px;
-    height: 200px;
-
-    border: 5px solid #ddd;
-    border-radius: 10px;
-    -moz-border-radius: 10px;
-}
-
-#middle {
-    background-color: #aaa;
-    position: relative;
-    width: 4px;
-    height: 4px;
-    left: 98px;
-    top: 98px;
-}
-
-#ball {
-    background-color: green;
-    position: relative;
-    width: 20px;
-    height: 20px;
-    left: 90px;
-    top: 90px;
-
-    border-radius: 20px;
-    -moz-border-radius: 20px;
-
-    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
-    -moz-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
-    -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
-
-    background-image: -moz-linear-gradient(top, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 12px);
-    background-image: -webkit-gradient(linear, 0 0, 0 12, from(rgba(255, 255, 255, .5)), to(rgba(255, 255, 255, 0)));
-}
-
-#warning {
-    padding: 5px 10px;
-    font-weight: bold;
-
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-
-    color: black;
-    background-color: #FDFFBF;
-    border: 1px solid #D7DE07;
-}
-
-#console {
-    width: 100%;
-    min-height:200px;
+.section {
+    margin: 10px 0 20px 0;
 }
 
 .win {
@@ -70,6 +19,10 @@ p {
 
 .lose {
     background-image: url(http://cdn.hexjam.com/editorial_service/bases/images/000/003/685/xlarge/David-Cameron-Sad.jpg.jpg?1404131443);
+}
+
+.draw {
+    background-image: url(http://static3.businessinsider.com/image/4e8c4b99eab8eaea1300009b/new-poll-has-the-worst-news-yet-for-obama.jpg);
 }
 
 .description {
@@ -115,19 +68,6 @@ p {
     display: inline-block;
 }
 
-.half-panel {
-    width:45%;
-    display: inline-block;
-    vertical-align: top;
-    text-align: center;
-    border: 1px solid black;
-}
-
-.half-panel {
-    margin: 10px auto;
-    display: inline-block;
-}
-
 .fullscreen {
     color: white;
     text-align: center;
@@ -150,4 +90,17 @@ p {
 
 .alive {
     background: lightgreen;
+}
+
+.play-again {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    text-align: center;
+}
+
+.end-text {
+    font-size: 30px;
+    text-shadow: 2px 2px 5px black;
+    font-weight: bold;
 }

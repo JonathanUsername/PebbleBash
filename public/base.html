@@ -4,16 +4,14 @@
     <div>
       <p>This is a game where the objective is to get your opponents to end up jogging/moving their phone too sharply. If they do, their screen goes red and they lose. The last player standing is declared the winner.</p>
     </div>
-    <p>ID: {{ player.id }}, Name: {{ player.name }}</p>
+    <!-- <p>ID: {{ player.id }}, Name: {{ player.name }}</p> -->
   </div>
   <form name="mainForm">
     <div class="game-start-controls">
-      <input ng-model="player.name" required type="text" placeholder="Your Name" name="playerName">
-      <div class="half-panel">
-        <input name="gameId" id="gameId" type="text" placeholder="Game ID" value="">
-        <div id="joinGame" class="button">Join Game</div>
+      <div class="section">
+        <input ng-model="player.name" required type="text" placeholder="Your Name" name="playerName">
       </div>
-      <div class="half-panel">
+      <div class="section">
         <div id="newGame" class="button" ng-click="newGame()">New Game</div>
       </div>
     </div>

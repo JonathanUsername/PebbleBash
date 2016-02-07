@@ -34,7 +34,6 @@ server.register(require('inert'), (err) => {
                         { name: 'Player Name', item: request.payload.name }];
 
       const missing = mustHaves.filter(i => !i.item);
-      console.log(mustHaves.map(i => i.item))
       if (missing.length > 0) {
         return reply(Boom.badRequest(`Missing required options: ${missing.map(i => i.name).join(', ')}`));
       }
@@ -51,7 +50,6 @@ server.register(require('inert'), (err) => {
         others = [];
       } else {
         roomId = gameName;
-        console.log('others --- ', socketsInRoom(gameName, true))
         others = socketsInRoom(gameName, true)
       }
 

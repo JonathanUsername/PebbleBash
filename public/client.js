@@ -29,10 +29,13 @@ app.controller('baseCtrl', function ($scope, $rootScope, $state, $stateParams, s
   };
 });
 
-angular.module('pebble-bash').config(function ($stateProvider, $urlRouterProvider) {
+angular.module('pebble-bash').config(function ($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider) {
 
   // Default route is base
   $urlRouterProvider.otherwise('/');
+
+  // Allow no trailing slash
+  $urlMatcherFactoryProvider.strictMode(false);
 
   $stateProvider.state('base', {
     url: '/',
@@ -222,7 +225,7 @@ app.factory('loading', function () {
 });
 'use strict';
 
-app.controller('playCtrl', function ($scope, $state, $stateParams, socket, Player) {
+app.controller('playCtrl', function ($scope, $state, $stateParams, socket, Player, $location) {
 
   console.log('starting play controller');
 
@@ -230,7 +233,7 @@ app.controller('playCtrl', function ($scope, $state, $stateParams, socket, Playe
   var LIMIT = 5;
 
   // CHANGEME
-  $scope.dev = true;
+  $scope.dev = $location.host() === 'localhost';
 
   $scope.lose = lose;
   $scope.playState = 'alive';
@@ -239,7 +242,10 @@ app.controller('playCtrl', function ($scope, $state, $stateParams, socket, Playe
 
   socket.on('gameover', function (data) {
     window.removeEventListener('devicemotion', listener, false);
-    console.log('winner id vs yours', data.winner.id, Player.id);
+    if (data.draw) {
+      console.log('you... draw?');
+      return $state.go('base.room.draw');
+    }
     if (data.winner.id === Player.id) {
       console.log('you win!');
       $state.go('base.room.win');
@@ -273,19 +279,19 @@ app.controller('playCtrl', function ($scope, $state, $stateParams, socket, Playe
     return false;
   }
 
-  // For DEV only
   function lose() {
     $scope.playState = 'dead';
     window.removeEventListener('devicemotion', listener, false);
-    window.navigator.vibrate(500);
+    window.navigator.vibrate(2000);
     socket.emit('loser');
-    console.log('lost');
+    console.log('you lost');
   }
 });
 
 app.controller('endCtrl', function ($scope, $state, $stateParams, socket) {
 
   $scope.outcome = $stateParams.outcome;
+  $scope.text = $stateParams.text;
 
   $scope.playAgain = function () {
     socket.emit('play-again');
@@ -301,13 +307,22 @@ angular.module('pebble-bash').config(function ($stateProvider) {
   }).state('base.room.win', {
     controller: 'endCtrl',
     params: {
-      outcome: 'win'
+      outcome: 'win',
+      text: 'WINNAH'
     },
     templateUrl: 'end.html'
   }).state('base.room.lose', {
     controller: 'endCtrl',
     params: {
-      outcome: 'lose'
+      outcome: 'lose',
+      text: 'LOOZAH'
+    },
+    templateUrl: 'end.html'
+  }).state('base.room.draw', {
+    controller: 'endCtrl',
+    params: {
+      outcome: 'draw',
+      text: 'It\'s a... draw?'
     },
     templateUrl: 'end.html'
   });
@@ -329,9 +344,13 @@ app.factory('Player', function ($http, $q, $log, $rootScope, socket, loading, $s
   };
 
   Player.joinRoom = function (roomId) {
-    Player.room = roomId;
     console.log('emitting join', roomId);
+    Player.room = roomId;
     socket.emit('join', Player);
+  };
+
+  Player.saveName = function () {
+    localStorage.playerName = Player.name;
   };
 
   socket.on('connect', function () {
@@ -393,6 +412,7 @@ app.controller('roomCtrl', function ($scope, $rootScope, $state, $location, $sta
 
   $scope.ready = function () {
     if (Player.name && $scope.roomJoined) {
+      Player.saveName();
       socket.emit('ready', {
         roomId: $scope.roomJoined,
         name: Player.name
