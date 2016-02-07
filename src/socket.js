@@ -1,7 +1,10 @@
 import socket from 'socket.io';
 import _ from 'lodash';
+import logger from 'winston';
 
 let io;
+
+logger.level = 'debug'
 
 const sockets = {}; // Indexed by socket id
 
@@ -12,7 +15,8 @@ function Messenger () {
     io = require('socket.io')(listener);
 
     io.on('connection', function(socket){
-      console.log('a user connected', socket.id);
+      logger.debug('user connected', socket.id);
+
       sockets[socket.id] = socket;
       _.assign(socket, {
         name: 'Anonymous',
@@ -22,14 +26,15 @@ function Messenger () {
       });
 
       socket.on('disconnect', function(){
-        console.log('user disconnected', socket.id);
-        socket.leave(socket.room);
-        console.log('Currently in room:', socketsInRoom(socket.room, true))
 
+        socket.leave(socket.room);
+
+        logger.debug('user disconnected', reduceSocketInfo(socket));
         sendUpdate(socket);
       });
 
       socket.on('join', function(data){
+
         if (socket.lastRoom) {
           socket.leave(socket.lastRoom);
           socket.lastRoom = null;
@@ -38,52 +43,70 @@ function Messenger () {
         socket.join(socket.room);
         socket.lastRoom = socket.room;
 
+        logger.debug(`${socket.name} joined ${socket.room}`);
         sendUpdate(socket);
       });
 
       socket.on('leave', function(data){
+
         socket.leave(socket.room);
         socket.ready = false;
 
+        logger.debug(`${socket.name} left ${socket.room}`);
         sendUpdate(socket);
       });
 
       socket.on('ready', function(data){
+
         if (data.name && data.name !== 'Anonymous') {
           socket.name = data.name;
         }
         socket.ready = true;
 
-        const allPlayers = socketsInRoom(socket.room)
+        const allPlayers = socketsInRoom(socket.room);
 
         const readyPlayers = allPlayers.filter(i => i.ready);
 
+        logger.debug(`${socket.name} in ${socket.room} is ready`);
         sendUpdate(socket);
 
-        console.log('readyPlayers:', readyPlayers.map(i => i.name));
-        console.log(readyPlayers.length, allPlayers.length)
         if (readyPlayers.length === allPlayers.length) {
-          console.log('STARTING', socket.room)
+          logger.debug(`${socket.room} is starting a game`);
+
           io.sockets.in(socket.room)
             .emit('start', 'YEAH');
         }
       });
 
       socket.on('loser', function(){
-        console.log('user lost', socket.name, socket.id);
+        logger.debug(`${socket.name} in ${socket.room} has lost`);
+
         socket.loser = true;
+        socket.ready = false;
         checkWinner();
+      });
+
+      socket.on('play-again', function(){
+        logger.debug(`${socket.name} in ${socket.room} is playing again`);
+
+        _.assign(socket, {
+          ready: false,
+          loser: false
+        });
+
+        sendUpdate(socket);
       });
 
       function checkWinner() {
         const allPlayers = socketsInRoom(socket.room);
         const stillStanding = allPlayers.filter(i => !i.loser);
         if (stillStanding.length === 1) {
-          console.log('we have a winner!')
           io.sockets.in(socket.room)
             .emit('gameover', {
               winner: reduceSocketInfo(stillStanding[0])
-            });
+            })
+          _.each(allPlayers, i => i.ready = false)
+          console.log(allPlayers.map(i => i.ready))
         }
       }
 
@@ -96,7 +119,6 @@ function Messenger () {
 
 function sendUpdate(socket) {
   const others = socketsInRoom(socket.room, true)
-  console.log('Currently in room:', socket.room, others)
   io.sockets.in(socket.room)
     .emit('room-update', others)
 }
@@ -120,13 +142,17 @@ function reduceSocketInfo(arr) {
   if (!arr.length) {
     arr = [arr];
   }
-  return arr.map(i => { 
+  const ret = arr.map(i => { 
       return {
         name: i.name, 
         ready: i.ready,
         id: i.id
       }
     });
+  if (ret.length === 1) {
+    return ret[0]
+  }
+  return ret
 }
 
 function broadcastTo(roomId, event, data) {

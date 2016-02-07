@@ -1,5 +1,5 @@
 app.controller('playCtrl', 
-  ($scope, $rootScope, $state, $location, $stateParams, socket, apiService, roomJoined, Player) => {
+  ($scope, $state, $stateParams, socket, Player) => {
 
     console.log('starting play controller')
 
@@ -16,8 +16,8 @@ app.controller('playCtrl',
 
     socket.on('gameover', data => {
       window.removeEventListener('devicemotion', listener, false)
-      console.log(data)
-      if (data.winner.id === socket.id) {
+      console.log('winner id vs yours', data.winner.id, Player.id)
+      if (data.winner.id === Player.id) {
         console.log('you win!')
         $state.go('base.room.win')
       } else {
@@ -27,7 +27,7 @@ app.controller('playCtrl',
     })
 
     function isWinner(data) {
-      return data.winnerId === socket.id
+      return data.winnerId === Player.id
     }
 
     function listener(ev) {
@@ -63,9 +63,14 @@ app.controller('playCtrl',
   })
 
 app.controller('endCtrl', 
-  ($scope, $rootScope, $state, $location, $stateParams, socket, apiService, roomJoined, Player) => {
+  ($scope, $state, $stateParams, socket) => {
 
     $scope.outcome = $stateParams.outcome;
+
+    $scope.playAgain = function() {
+      socket.emit('play-again');
+      $state.go('base.room');
+    };
 
   })
 
@@ -76,17 +81,16 @@ angular.module('pebble-bash').config(function (
 
   $stateProvider
     .state('base.room.play', {
-        url: 'play',
         controller: 'playCtrl',
         templateUrl: 'play.html'
-      });
+      })
     .state('base.room.win', {
         controller: 'endCtrl',
         params: {
           outcome: 'win'
         },
         templateUrl: 'end.html'
-      });
+      })
     .state('base.room.lose', {
         controller: 'endCtrl',
         params: {
