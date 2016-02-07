@@ -5,7 +5,7 @@ import Hapi from 'hapi';
 import logger from 'winston';
 import Boom from 'boom';
 import socket from './socket.js'
-import {getPlayer, Player} from './player.js'
+import {getPlayer, Player, createPlayer} from './player.js'
 import {getRoom, Room} from './room.js'
 
 const server = new Hapi.Server();
@@ -46,8 +46,10 @@ server.register(require('inert'), (err) => {
 
       if (!request.params.gameName || request.payload.playerId || request.payload.name)
 
-      logger.info(`Requested game ${playerId}`);
-      const player = getPlayer(playerId)
+      logger.info(`Requested player ${playerId}`);
+
+      const foundPlayer = getPlayer(playerId);
+      const player = foundPlayer ? foundPlayer : createPlayer(playerId);
 
       player.name = playerName;
 
@@ -66,9 +68,14 @@ server.register(require('inert'), (err) => {
           roomId: existingRoom.id
         })
       } else {
-        return reply({ 
-          error: `Could not find room with name "${gameName}"`
+        const room = new Room({
+          id: gameName
+        }).addPlayer(player)
+        console.log(room)
+        return reply({
+          roomId: room.id
         });
+        // return reply(Boom.badRequest(`Cannot find room by that name! Has it closed/emptied already?`));
       }
     }
   });

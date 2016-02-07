@@ -47,7 +47,6 @@ p {
 }
 
 #warning {
-    display: none;
     padding: 5px 10px;
     font-weight: bold;
 
@@ -63,10 +62,6 @@ p {
 #console {
     width: 100%;
     min-height:200px;
-}
-
-#indicator {
-    display: none;
 }
 
 #win-screen {
@@ -133,10 +128,6 @@ p {
     display: inline-block;
 }
 
-.waiting {
-    display: none;
-}
-
 .fullscreen {
     color: white;
     text-align: center;
@@ -149,7 +140,6 @@ p {
 }
 
 .end-image {
-    display:none;
     background-size: contain;
     background-repeat: no-repeat;
 }

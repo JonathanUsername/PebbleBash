@@ -1,5 +1,14 @@
 app.factory('socket', function ($rootScope) {
   var socket = io.connect();
+
+  socket.on('disconnect', () => {
+    console.log('DISCONNECTED FROM SOCKET')
+  })
+
+  socket.on('player-joined', (name) => {
+    console.log('Player joined: ', name)
+  })
+
   return {
     on: function (eventName, callback) {
       socket.on(eventName, function () {  

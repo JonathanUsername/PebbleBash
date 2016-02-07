@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Moniker from 'moniker';
+import { broadcastTo } from './socket.js';
 
 const rooms = [];
 
@@ -16,7 +17,10 @@ class Room {
   constructor (args) {
     _.assign(this, args);
 
-    this.id = Moniker.choose();
+    if (!this.id) {
+      this.id = Moniker.choose();
+    }
+
     this.players = [];
 
     console.log('adding room to rooms')
@@ -25,14 +29,21 @@ class Room {
     return this;
   }
 
+  getPlayers() {
+    return this.players.map(i => i.name);
+  }
+
   addPlayer(player) {
     console.log('adding player to room')
     this.players.push(player)
     player.room = this;
+    console.log(`Players currently in room: ${this.getPlayers()}`)
+    broadcastTo(this.id, 'player-joined', player.name)
     return this;
   }
 
   removePlayer(player) {
+    console.log(`removing player ${player.id}`)
     const newArray = this.players.filter(i => i.id !== player.id)
     this.players = newArray;
     player.room = false;

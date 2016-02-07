@@ -18,11 +18,13 @@ app.factory('apiService', function (
 
       const params = data ? data : {};
 
-      params.name = Player.name;
-      params.playerId = Player.id;
+      params.name = params.name || Player.name;
+      params.playerId = params.playerId || Player.id;
 
       localStorage.playerName = Player.name;
-      
+
+      console.log(params)
+
       $http.post(url, params).then((resp) => {
         loading.finish();
         deferred.resolve(resp.data);

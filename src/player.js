@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import socket from './socket.js';
+import socket, { getSocket } from './socket.js';
 
 const players = [];
 
@@ -10,6 +10,13 @@ function getPlayer (id) {
     return false
   }
   return finds[0];
+}
+
+function createPlayer (id) {
+  return new Player({
+    id: id,
+    socket: getSocket[id]
+  })
 }
 
 class Player {
@@ -32,9 +39,12 @@ class Player {
     return this;
   }
 
-  remove(data) {
-    if (!this || !this.room) return;
-    this.room.removePlayer(this);
+  remove(room) {
+    if (!this || !room) {
+      console.log('no this', this)
+      return;
+    }
+    room.removePlayer(this);
     return this;
   }
 
@@ -57,6 +67,7 @@ class Player {
       type: 'lose'
     });
   }
+
 }
 
-export {getPlayer, Player};
+export {getPlayer, Player, createPlayer};

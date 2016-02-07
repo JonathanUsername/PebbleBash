@@ -14,26 +14,21 @@ app.run(function ($rootScope, $state, $window, $log, $stateParams, $q) {
 
 app.controller('baseCtrl', function ($scope, $rootScope, $state, $stateParams, socket, apiService, Player, loading) {
 
-  console.log('starting controller');
-
-  $scope.newGame = function () {
-    var url = '/room/new';
-    apiService.send(url).then(function (data) {
-      if (data.error) {
-        return alert(data.error);
-      }
-      $state.go('waiting', data);
-    });
-  };
+  console.log('starting base controller');
 
   $scope.player = Player;
 
   loading.start();
-  socket.on('connect', function () {
-    console.log('socket connected');
-    Player.id = socket.getId();
-    loading.finish();
-  });
+
+  console.log($state.current.name);
+
+  $scope.newGame = function () {
+    $state.go('base.waiting', {
+      roomId: 'new'
+    }, {
+      reload: true
+    });
+  };
 });
 
 angular.module('pebble-bash').config(function ($stateProvider, $urlRouterProvider) {
@@ -44,7 +39,12 @@ angular.module('pebble-bash').config(function ($stateProvider, $urlRouterProvide
   $stateProvider.state('base', {
     url: '/',
     controller: 'baseCtrl',
-    templateUrl: 'base.html'
+    templateUrl: 'base.html',
+    resolve: {
+      socketConnected: function socketConnected(Player) {
+        return Player.connected();
+      }
+    }
   });
 });
 // const LIMIT = 5;
@@ -224,8 +224,21 @@ app.factory('Player', function ($http, $q, $log, $rootScope, socket, loading) {
 
   var Player = {
     id: '',
-    name: ''
+    name: localStorage.playerName || ''
   };
+
+  var connectedPromise = $q.defer();
+
+  Player.connected = function () {
+    return connectedPromise.promise;
+  };
+
+  socket.on('connect', function () {
+    console.log('socket connected');
+    Player.id = socket.getId();
+    loading.finish();
+    connectedPromise.resolve(Player.id);
+  });
 
   Player.getId = function () {
     return _this.id;
@@ -249,10 +262,12 @@ app.factory('apiService', function ($http, $q, $log, $rootScope, socket, loading
 
       var params = data ? data : {};
 
-      params.name = Player.name;
-      params.playerId = Player.id;
+      params.name = params.name || Player.name;
+      params.playerId = params.playerId || Player.id;
 
       localStorage.playerName = Player.name;
+
+      console.log(params);
 
       $http.post(url, params).then(function (resp) {
         loading.finish();
@@ -271,6 +286,15 @@ app.factory('apiService', function ($http, $q, $log, $rootScope, socket, loading
 
 app.factory('socket', function ($rootScope) {
   var socket = io.connect();
+
+  socket.on('disconnect', function () {
+    console.log('DISCONNECTED FROM SOCKET');
+  });
+
+  socket.on('player-joined', function (name) {
+    console.log('Player joined: ', name);
+  });
+
   return {
     on: function on(eventName, callback) {
       socket.on(eventName, function () {
@@ -295,59 +319,83 @@ app.factory('socket', function ($rootScope) {
     }
   };
 });
-// app.controller('baseCtrl',
-//   ($scope, $rootScope, $state, $stateParams, socket, apiService) => {
+'use strict';
 
-//     console.log('starting controller')
+app.controller('waitingCtrl', function ($scope, $rootScope, $state, $stateParams, socket, apiService, roomJoined, Player) {
 
-//     $scope.newGame = function() {
-//       const url = '/room/new';
-//       apiService.send(url)
-//         .then(data => {
-//           if (data.error) {
-//             return alert(data.error)
-//           }
+  console.log('starting waiting controller');
 
-//           alert('success!', JSON.stringify(data))
-//         })
-//     }
+  // Update room if new
+  $scope.roomJoined = roomJoined.roomId;
+  $state.go('.', {
+    roomId: $scope.roomJoined
+  }, { reload: false });
 
-//     $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-//       console.log('in $stateChangeStart');
-//     })
-//     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
-//       console.log('in $stateChangeSuccess');
-//     })
-//     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams){
-//       console.log('in $stateChangeError');
-//     })
+  console.log($stateParams);
 
-//     $rootScope.playerName = localStorage.name || '';
-//     $rootScope.playerId = 'Connecting to server...';
-//     $rootScope.testing = 'rootScope visible';
+  $scope.something = 'yeah';
 
-//     socket.on('connect', () => {
-//       console.log('connected');
-//       $rootScope.playerId = socket.getId();
-//     })
+  $scope.goBack = function () {
+    $state.go('base');
+  };
 
-//   })
+  $scope.ready = function () {
+    if (Player.name && $scope.roomJoined) {
+      socket.emit('ready', {
+        roomId: $scope.roomJoined
+      });
+    } else {
+      alert('You have no name? How can you win if you have no name??');
+    }
+  };
 
-// angular.module('pebble-bash').config(function (
-//   $stateProvider,
-//   $urlRouterProvider
-// ) {
+  // $scope.newGame = function() {
+  //   const url = '/room/new';
+  //   apiService.send(url)
+  //     .then(data => {
+  //       if (data.error) {
+  //         return alert(data.error)
+  //       }
 
-//   // Default route is base
-//   $urlRouterProvider.otherwise('/');
+  //       alert('success!', JSON.stringify(data))
+  //     })
+  // }
 
-//   $stateProvider
-//     .state('base', {
-//       url: '/:roomId',
-//       controller: 'baseCtrl',
-//       templateUrl: 'base.html'
-//     });
-// });
-"use strict";
+  // $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+  //   console.log('in $stateChangeStart');
+  // })
+  // $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
+  //   console.log('in $stateChangeSuccess');
+  // })
+  // $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams){
+  //   console.log('in $stateChangeError');
+  // })
+
+  // $rootScope.playerName = localStorage.name || '';
+  // $rootScope.playerId = 'Connecting to server...';
+  // $rootScope.testing = 'rootScope visible';
+
+  // socket.on('connect', () => {
+  //   console.log('connected');
+  //   $rootScope.playerId = socket.getId();
+  // })
+});
+
+angular.module('pebble-bash').config(function ($stateProvider) {
+
+  $stateProvider.state('base.waiting', {
+    url: ':roomId/waiting/',
+    controller: 'waitingCtrl',
+    templateUrl: 'waiting.html',
+    resolve: {
+      roomJoined: function roomJoined($stateParams, apiService, socketConnected, Player) {
+        return apiService.send('/room/' + $stateParams.roomId, {
+          playerId: Player.id,
+          name: Player.name || 'Anonymous'
+        });
+      }
+    }
+  });
+});
 
 //# sourceMappingURL=client.js.map
