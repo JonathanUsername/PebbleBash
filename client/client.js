@@ -1,7 +1,6 @@
 const LIMIT = 5;
 
 const socket = io();
-const out = $('#console')[0];
 const indicator = $('#indicator');
 
 if (!window.DeviceMotionEvent) {
@@ -52,7 +51,7 @@ function joinGame () {
         alert(room.error)
       } else {
         $('.starting-info').hide();
-        $('#console').text(`Your game name is: ${data.roomId}`)
+        $('#gameName').text(`Your game name is: ${data.roomId}`)
         localStorage.gameName = data.roomId;
         $('.waiting').show();
       }
