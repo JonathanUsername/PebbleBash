@@ -4,7 +4,8 @@ app.factory('Player', function (
   $log,
   $rootScope,
   socket,
-  loading
+  loading,
+  $stateParams
 ) {
 
   const Player = {
@@ -14,14 +15,24 @@ app.factory('Player', function (
 
   const connectedPromise = $q.defer();
 
-  Player.connected = () => {
+  Player.resolveConnect = () => {
     return connectedPromise.promise;
   };
+
+  Player.joinRoom = (roomId) => {
+    Player.room = roomId;
+    console.log('emitting join', roomId)
+    socket.emit('join', Player)
+  }
 
   socket.on('connect', () => {
     console.log('socket connected');
     Player.id = socket.getId();
     loading.finish();
+    if ($stateParams.roomId) {
+      console.log('stateparams exists so joining')
+      Player.joinRoom($stateParams.roomId);
+    }
     connectedPromise.resolve(Player.id);
   })
 

@@ -5,12 +5,13 @@ app.factory('socket', function ($rootScope) {
     console.log('DISCONNECTED FROM SOCKET')
   })
 
-  socket.on('player-joined', (name) => {
-    console.log('Player joined: ', name)
+  socket.on('message', (data) => {
+    console.log('message:', data)
   })
 
   return {
     on: function (eventName, callback) {
+      console.log('registering', eventName)
       socket.on(eventName, function () {  
         var args = arguments;
         $rootScope.$apply(function () {

@@ -5,12 +5,11 @@ app.controller('baseCtrl',
 
     $scope.player = Player;
 
-    loading.start();
-
     console.log($state.current.name)
 
+
     $scope.newGame = function() {
-      $state.go('base.waiting', {
+      $state.go('base.room', {
         roomId: 'new'
       }, {
         reload: true
@@ -33,8 +32,13 @@ angular.module('pebble-bash').config(function (
       controller: 'baseCtrl',
       templateUrl: 'base.html',
       resolve: {
+        leaveRooms: (socket) => {
+          // Make sure we're not in a room
+          console.log('resolving leave')
+          socket.emit('leave');
+        },
         socketConnected: (Player) => {
-          return Player.connected();
+          return Player.resolveConnect();
         }
       }
     });

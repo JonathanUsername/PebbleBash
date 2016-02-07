@@ -4,9 +4,8 @@ import ejs from 'ejs';
 import Hapi from 'hapi';
 import logger from 'winston';
 import Boom from 'boom';
-import socket from './socket.js'
-import {getPlayer, Player, createPlayer} from './player.js'
-import {getRoom, Room} from './room.js'
+import socket, { getSocket, socketsInRoom } from './socket.js';
+import Moniker from 'moniker';
 
 const server = new Hapi.Server();
 
@@ -41,42 +40,32 @@ server.register(require('inert'), (err) => {
       }
 
       const gameName = request.params.gameName.toLowerCase().trim();
-      const playerId = request.payload.playerId
-      const playerName = request.payload.name
+      const playerName = request.params.name;
+      const playerId = request.params.playerId;
 
-      if (!request.params.gameName || request.payload.playerId || request.payload.name)
-
-      logger.info(`Requested player ${playerId}`);
-
-      const foundPlayer = getPlayer(playerId);
-      const player = foundPlayer ? foundPlayer : createPlayer(playerId);
-
-      player.name = playerName;
+      let roomId;
+      let others;
 
       if (gameName === 'new') {
-        const room = new Room().addPlayer(player)
-        console.log(room)
-        return reply({
-          roomId: room.id
-        });
+        roomId = Moniker.choose();
+        others = [];
+      } else {
+        roomId = gameName;
+        console.log('others --- ', socketsInRoom(gameName, true))
+        others = socketsInRoom(gameName, true)
       }
 
-      const existingRoom = getRoom(gameName);
-      if (existingRoom) {
-        existingRoom.addPlayer(player);
-        return reply({
-          roomId: existingRoom.id
-        })
-      } else {
-        const room = new Room({
-          id: gameName
-        }).addPlayer(player)
-        console.log(room)
-        return reply({
-          roomId: room.id
-        });
-        // return reply(Boom.badRequest(`Cannot find room by that name! Has it closed/emptied already?`));
+      const knownSocket = getSocket(playerId);
+
+      if (knownSocket) {
+        const socket = getSocket[playerId]
+        socket.join(gameName);
       }
+
+      return reply({
+        roomId: roomId,
+        others: others
+      });
     }
   });
 

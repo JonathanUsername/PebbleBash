@@ -1,0 +1,22 @@
+<div class="waiting">
+  <form name="waitingForm">
+      <input ng-model="player.name" required type="text" placeholder="Your Name" name="playerName">
+      <span class="error" ng-show="waitingForm.playerName.$error.required">You have no name? How can you win if you have no name??</span>
+    </form>
+  <div ng-click="goBack()" class="button">Back</div>
+  <div ng-click="ready()" class="button">Ready?</div>
+  <div>
+    <p>Link to give to your friends:</p>
+    <a ng-href="{{url}}">{{url}}</a>
+  </div>
+</div>
+
+</div>
+  <div ng-repeat="other in others">
+    <div>Name: {{other.name}}</div>
+    <div>Ready: {{other.ready}}</div>
+  </div>
+</div>
+
+
+
