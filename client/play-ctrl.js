@@ -1,5 +1,5 @@
 app.controller('playCtrl', 
-  ($scope, $state, $stateParams, socket, Player, $location) => {
+  ($scope, $state, socket, Player, $location) => {
 
     console.log('starting play controller')
 

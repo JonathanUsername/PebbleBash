@@ -1,11 +1,9 @@
 app.controller('baseCtrl', 
-  ($scope, $rootScope, $state, $stateParams, socket, apiService, Player, loading) => {
+  ($scope, $state, Player) => {
 
     console.log('starting base controller')
 
     $scope.player = Player;
-
-    console.log($state.current.name)
 
     $scope.newGame = function() {
       $state.go('base.room', {

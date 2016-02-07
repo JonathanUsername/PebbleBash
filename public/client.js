@@ -2,8 +2,14 @@
 
 var app = angular.module('pebble-bash', ['ui.router']);
 
-app.run(function ($rootScope, $state, $window, $log, $stateParams, $q) {
+app.run(function ($rootScope, $state, $log, $stateParams, loading) {
   $rootScope.$on('$stateChangeError', $log.log.bind($log));
+  $rootScope.$on('$stateChangeStart', function () {
+    loading.start();
+  });
+  $rootScope.$on('$stateChangeSuccess', function () {
+    loading.finish();
+  });
 
   $rootScope.$state = $state;
   $rootScope.$stateParams = $stateParams;
@@ -12,13 +18,11 @@ app.run(function ($rootScope, $state, $window, $log, $stateParams, $q) {
 });
 'use strict';
 
-app.controller('baseCtrl', function ($scope, $rootScope, $state, $stateParams, socket, apiService, Player, loading) {
+app.controller('baseCtrl', function ($scope, $state, Player) {
 
   console.log('starting base controller');
 
   $scope.player = Player;
-
-  console.log($state.current.name);
 
   $scope.newGame = function () {
     $state.go('base.room', {
@@ -54,160 +58,6 @@ angular.module('pebble-bash').config(function ($stateProvider, $urlRouterProvide
     }
   });
 });
-// const LIMIT = 5;
-
-// const socket = io();
-// const indicator = $('#indicator');
-
-// if (!window.DeviceMotionEvent) {
-//   alert('Device motion is not supported! You can\'t have any fun, sorry.');
-// }
-
-// if (localStorage.name) {
-//   $('#name').val(localStorage.name);
-// }
-
-// $('#newGame').click(newGame);
-// $('#joinGame').click(joinGame);
-// $('#startGame').click(startGame);
-// $('#lose').click(lose);
-// // $('.playAgain').click(playAgain);
-
-// function send (url, data) {
-//   const params = data ? data : {};
-
-//   const name = $('#name').val();
-//   localStorage.name = name;
-
-//   params.name = name;
-//   params.playerId = socket.id;
-
-//   return $.ajax(url, {
-//     method: 'POST',
-//     data: params
-//   });
-// }
-
-// function newGame () {
-//   const url = '/room/new';
-//   send(url)
-//     .done(data => {
-//       $('.starting-info').hide();
-//       $('#gameName').text(`Your game name is: ${data.roomId}`)
-//       localStorage.gameName = data.roomId;
-//       $('.waiting').show();
-//     })
-// }
-
-// function joinGame () {
-//   const url = '/room/' + $('#gameId').val();
-//   send(url)
-//     .done(data => {
-//       if (data.error) {
-//         alert(room.error)
-//       } else {
-//         $('.starting-info').hide();
-//         $('#gameName').text(`Your game name is: ${data.roomId}`)
-//         localStorage.gameName = data.roomId;
-//         $('.waiting').show();
-//       }
-//     })
-//   $('gameId').val();
-// }
-
-// function changeState (nextState) {
-
-// }
-
-// let currentState;
-// currentState = 'initial';
-
-// const state = {
-//   initial: () => {
-//     $('.starting-info').show();
-//     $('#win-screen').hide();
-//     $('#lose-screen').hide();
-//     $('#gameName').text('');
-//     $('.waiting').hide();
-//   },
-//   waitingRoom: () => {
-//     $('.starting-info').hide();
-//     $('#gameName').text(`Your game name is: ${data.roomId}`)
-//     $('.waiting').show();
-//   },
-//   playing: () => {
-
-//   },
-//   won: () => {
-
-//   },
-//   lost: () => {
-
-//   }
-// }
-
-// function startGame () {
-
-//   // const name = $('#name').val();
-
-//   // if (!name) return alert('You must tell me who you are!');
-
-//   window.addEventListener('devicemotion', listener, false);
-
-//   indicator.addClass('alive').show();
-
-//   socket.on('gameover', data => {
-//     window.removeEventListener('devicemotion', listener, false)
-//     console.log(data)
-//     console.log(socket.id)
-//     var winner = data.winner;
-//     var won = isWinner(data);
-//     if (won) {
-//       winner = 'YOU';
-//       $('#win-screen').show();
-//     } else {
-//       $('#lose-screen').show();
-//     }
-//     indicator.removeClass('alive')
-//       .removeClass('loser')
-//       .text('')
-//       .hide();
-//   })
-// }
-
-// function isWinner(data) {
-//   return data.winnerId === socket.id
-// }
-
-// function listener(ev) {
-//   if (!ev.acceleration) return;
-//   const acc = ev.acceleration;
-//   jogHandler(acc.x, acc.y, acc.z);
-// }
-
-// function jogHandler(x, y, z) {
-//   const arr = [x, y, z]
-//   if (arr.filter(overTheLimit).length > 0) {
-//     lose(listener);
-//   }
-// }
-
-// function overTheLimit(coord) {
-//   if (coord > LIMIT) {
-//       return true;
-//   }
-//   return false;
-// }
-
-// function lose() {
-//   window.removeEventListener('devicemotion', listener, false);
-//   indicator.removeClass('alive').addClass('loser').text('LOSER');
-//   socket.emit('loser', {
-//     id: socket.id
-//   })
-//   window.navigator.vibrate(500);
-// }
-"use strict";
 'use strict';
 
 app.factory('loading', function () {
@@ -226,7 +76,7 @@ app.factory('loading', function () {
 });
 'use strict';
 
-app.controller('playCtrl', function ($scope, $state, $stateParams, socket, Player, $location) {
+app.controller('playCtrl', function ($scope, $state, socket, Player, $location) {
 
   console.log('starting play controller');
 
@@ -330,7 +180,7 @@ angular.module('pebble-bash').config(function ($stateProvider) {
 });
 'use strict';
 
-app.factory('Player', function ($http, $q, $log, $rootScope, socket, loading, $stateParams) {
+app.factory('Player', function ($http, $q, $log, $rootScope, socket, $stateParams) {
   var _this = this;
 
   var Player = {
@@ -357,7 +207,6 @@ app.factory('Player', function ($http, $q, $log, $rootScope, socket, loading, $s
   socket.on('connect', function () {
     console.log('socket connected');
     Player.id = socket.getId();
-    loading.finish();
     if ($stateParams.roomId) {
       console.log('stateparams exists so joining');
       Player.joinRoom($stateParams.roomId);
@@ -376,7 +225,7 @@ app.factory('Player', function ($http, $q, $log, $rootScope, socket, loading, $s
 });
 'use strict';
 
-app.controller('roomCtrl', function ($scope, $rootScope, $state, $location, $stateParams, socket, apiService, roomJoined, Player) {
+app.controller('roomCtrl', function ($scope, $state, $location, $stateParams, socket, roomJoined, Player) {
 
   console.log('starting room controller');
 

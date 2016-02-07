@@ -4,7 +4,6 @@ app.factory('Player', function (
   $log,
   $rootScope,
   socket,
-  loading,
   $stateParams
 ) {
 
@@ -32,7 +31,6 @@ app.factory('Player', function (
   socket.on('connect', () => {
     console.log('socket connected');
     Player.id = socket.getId();
-    loading.finish();
     if ($stateParams.roomId) {
       console.log('stateparams exists so joining');
       Player.joinRoom($stateParams.roomId);

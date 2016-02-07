@@ -3,12 +3,13 @@ const app = angular.module('pebble-bash', ['ui.router'])
 app.run((
   $rootScope,
   $state,
-  $window,
   $log,
   $stateParams,
-  $q
+  loading
 ) => {
   $rootScope.$on('$stateChangeError', $log.log.bind($log));
+  $rootScope.$on('$stateChangeStart', () => { loading.start(); });
+  $rootScope.$on('$stateChangeSuccess', () => { loading.finish(); });
 
   $rootScope.$state = $state;
   $rootScope.$stateParams = $stateParams;

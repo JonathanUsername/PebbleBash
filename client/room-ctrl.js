@@ -1,5 +1,5 @@
 app.controller('roomCtrl', 
-  ($scope, $rootScope, $state, $location, $stateParams, socket, apiService, roomJoined, Player) => {
+  ($scope, $state, $location, $stateParams, socket, roomJoined, Player) => {
 
     console.log('starting room controller')
 
