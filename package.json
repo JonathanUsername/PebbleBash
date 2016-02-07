@@ -1,19 +1,20 @@
 {
   "name": "PebbleBash",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple game by Jonathan King",
   "main": "bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "babel --source-maps --out-dir lib/ src --watch",
     "devClient": "babel --source-maps --out-file public/client.js client/ --watch",
-    "postinstall": "babel --out-dir lib/ src/ && babel --out-dir public/ client/",
-    "start": "nodemon lib/index.js"
+    "postinstall": "babel --out-dir lib/ src/ && babel --out-dir public/ client/ && 
+                    babel --source-maps --out-file public/client.js client/",
+    "start": "nodemon -w src lib/index.js"
   },
   "engines": {
     "node": "4.1.1"
   },
-  "author": "",
+  "author": "jonathan.j.king@gmail.com",
   "license": "ISC",
   "dependencies": {
     "babel-cli": "~6.3.17",
