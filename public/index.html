@@ -1,60 +1,42 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Pebble Bash</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel='stylesheet' href='styles.css' >
-</head>
-<body>
+<html ng-app="pebble-bash">
+  <head>
+      <title>Pebble Bash</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link rel='stylesheet' href='styles.css' >
+  </head>
+  <body>
 
-<div class='starting-info'>
+    <div ui-view>
 
-  <div class="description">
-    <h1>Pebble Bash</h1>
-    
-    <div>
-      <p>This is a game where the objective is to get your opponents to end up jogging/moving their phone too sharply. If they do, their screen goes red and they lose. The last player standing is declared the winner.</p>
     </div>
-  </div>
 
-  <div class="game-start-controls">
-    <input name="name" id="name" type="text" placeholder="Your Name" value="">
-    <div class="half-panel">
-      <input name="gameId" id="gameId" type="text" placeholder="Game ID" value="">
-      <div id='joinGame' class='button'>Join Game</div>
+    <div ng-show="isLoading()">
+      LOADING...
     </div>
-    
-    <div class="half-panel">
-      <div id='newGame' class='button'>New Game</div>
+
+    <div id='indicator' class='fullscreen'>
+      <!-- FOR DEV ONLY -->
+      <div id='lose' class='button'>LOSE</div>  
     </div>
-  </div>
 
-</div>
+    <div id='lose-screen' class='end-image fullscreen'>
+      <p>LOOOZAH</p>
+      <div class='button playAgain'>Play Again?</div>
+    </div>
 
-<div class="waiting">
-  <div id='startGame' class='button'>Start Game</div>
-  <div id="gameName"> </div>
-</div>
+    <div id='win-screen' class='end-image fullscreen'>
+      <p>WINNAHH</p>
+      <div class='button playAgain'>Play Again?</div>
+    </div>
 
-<div id='indicator' class='fullscreen'>
-  <div id='lose' class='button'>LOSE</div> 
-</div>
-
-<div id='lose-screen' class='end-image fullscreen'>
-  <p>LOOOZAH</p>
-  <div class='button playAgain'>Play Again?</div>
-</div>
-
-<div id='win-screen' class='end-image fullscreen'>
-  <p>WINNAHH</p>
-  <div class='button playAgain'>Play Again?</div>
-</div>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src='//code.jquery.com/jquery-2.2.0.min.js'></script>
-<script src='./client.js'></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.1.5/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.17/angular-ui-router.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src='//code.jquery.com/jquery-2.2.0.min.js'></script>
+    <script src='./client.js'></script>
 
 
-</body>
+  </body>
 </html>

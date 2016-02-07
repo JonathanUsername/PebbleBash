@@ -1,128 +1,353 @@
 'use strict';
 
-var LIMIT = 5;
+var app = angular.module('pebble-bash', ['ui.router']);
 
-var socket = io();
-var indicator = $('#indicator');
+app.run(function ($rootScope, $state, $window, $log, $stateParams, $q) {
+  $rootScope.$on('$stateChangeError', $log.log.bind($log));
 
-if (!window.DeviceMotionEvent) {
-  alert('Device motion is not supported! You can\'t have any fun, sorry.');
-}
+  $rootScope.$state = $state;
+  $rootScope.$stateParams = $stateParams;
 
-if (localStorage.name) {
-  $('#name').val(localStorage.name);
-}
+  console.log('starting module');
+});
+'use strict';
 
-$('#newGame').click(newGame);
-$('#joinGame').click(joinGame);
-$('#startGame').click(startGame);
-$('#lose').click(lose);
-$('.playAgain').click(playAgain);
+app.controller('baseCtrl', function ($scope, $rootScope, $state, $stateParams, socket, apiService, Player, loading) {
 
-function send(url, data) {
-  var params = data ? data : {};
+  console.log('starting controller');
 
-  var name = $('#name').val();
-  localStorage.name = name;
+  $scope.newGame = function () {
+    var url = '/room/new';
+    apiService.send(url).then(function (data) {
+      if (data.error) {
+        return alert(data.error);
+      }
+      $state.go('waiting', data);
+    });
+  };
 
-  params.name = name;
-  params.playerId = socket.id;
+  $scope.player = Player;
 
-  return $.ajax(url, {
-    method: 'POST',
-    data: params
+  loading.start();
+  socket.on('connect', function () {
+    console.log('socket connected');
+    Player.id = socket.getId();
+    loading.finish();
   });
-}
+});
 
-function newGame() {
-  var url = '/room/new';
-  send(url).done(function (data) {
-    $('.starting-info').hide();
-    $('#gameName').text('Your game name is: ' + data.roomId);
-    localStorage.gameName = data.roomId;
-    $('.waiting').show();
+angular.module('pebble-bash').config(function ($stateProvider, $urlRouterProvider) {
+
+  // Default route is base
+  $urlRouterProvider.otherwise('/');
+
+  $stateProvider.state('base', {
+    url: '/',
+    controller: 'baseCtrl',
+    templateUrl: 'base.html'
   });
-}
+});
+// const LIMIT = 5;
 
-function joinGame() {
-  var url = '/room/' + $('#gameId').val();
-  send(url).done(function (data) {
-    if (data.error) {
-      alert(room.error);
-    } else {
-      $('.starting-info').hide();
-      $('#gameName').text('Your game name is: ' + data.roomId);
-      localStorage.gameName = data.roomId;
-      $('.waiting').show();
+// const socket = io();
+// const indicator = $('#indicator');
+
+// if (!window.DeviceMotionEvent) {
+//   alert('Device motion is not supported! You can\'t have any fun, sorry.');
+// }
+
+// if (localStorage.name) {
+//   $('#name').val(localStorage.name);
+// }
+
+// $('#newGame').click(newGame);
+// $('#joinGame').click(joinGame);
+// $('#startGame').click(startGame);
+// $('#lose').click(lose);
+// // $('.playAgain').click(playAgain);
+
+// function send (url, data) {
+//   const params = data ? data : {};
+
+//   const name = $('#name').val();
+//   localStorage.name = name;
+
+//   params.name = name;
+//   params.playerId = socket.id;
+
+//   return $.ajax(url, {
+//     method: 'POST',
+//     data: params
+//   });
+// }
+
+// function newGame () {
+//   const url = '/room/new';
+//   send(url)
+//     .done(data => {
+//       $('.starting-info').hide();
+//       $('#gameName').text(`Your game name is: ${data.roomId}`)
+//       localStorage.gameName = data.roomId;
+//       $('.waiting').show();
+//     })
+// }
+
+// function joinGame () {
+//   const url = '/room/' + $('#gameId').val();
+//   send(url)
+//     .done(data => {
+//       if (data.error) {
+//         alert(room.error)
+//       } else {
+//         $('.starting-info').hide();
+//         $('#gameName').text(`Your game name is: ${data.roomId}`)
+//         localStorage.gameName = data.roomId;
+//         $('.waiting').show();
+//       }
+//     })
+//   $('gameId').val();
+// }
+
+// function changeState (nextState) {
+
+// }
+
+// let currentState;
+// currentState = 'initial';
+
+// const state = {
+//   initial: () => {
+//     $('.starting-info').show();
+//     $('#win-screen').hide();
+//     $('#lose-screen').hide();
+//     $('#gameName').text('');
+//     $('.waiting').hide();
+//   },
+//   waitingRoom: () => {
+//     $('.starting-info').hide();
+//     $('#gameName').text(`Your game name is: ${data.roomId}`)
+//     $('.waiting').show();
+//   },
+//   playing: () => {
+
+//   },
+//   won: () => {
+
+//   },
+//   lost: () => {
+
+//   }
+// }
+
+// function startGame () {
+
+//   // const name = $('#name').val();
+
+//   // if (!name) return alert('You must tell me who you are!');
+
+//   window.addEventListener('devicemotion', listener, false);
+
+//   indicator.addClass('alive').show();
+
+//   socket.on('gameover', data => {
+//     window.removeEventListener('devicemotion', listener, false)
+//     console.log(data)
+//     console.log(socket.id)
+//     var winner = data.winner;
+//     var won = isWinner(data);
+//     if (won) {
+//       winner = 'YOU';
+//       $('#win-screen').show();
+//     } else {
+//       $('#lose-screen').show();
+//     }
+//     indicator.removeClass('alive')
+//       .removeClass('loser')
+//       .text('')
+//       .hide();
+//   })
+// }
+
+// function isWinner(data) {
+//   return data.winnerId === socket.id
+// }
+
+// function listener(ev) {
+//   if (!ev.acceleration) return;
+//   const acc = ev.acceleration;
+//   jogHandler(acc.x, acc.y, acc.z);
+// }
+
+// function jogHandler(x, y, z) {
+//   const arr = [x, y, z]
+//   if (arr.filter(overTheLimit).length > 0) {
+//     lose(listener);
+//   }
+// }
+
+// function overTheLimit(coord) {
+//   if (coord > LIMIT) {
+//       return true;
+//   }
+//   return false;
+// }
+
+// function lose() {
+//   window.removeEventListener('devicemotion', listener, false);
+//   indicator.removeClass('alive').addClass('loser').text('LOSER');
+//   socket.emit('loser', {
+//     id: socket.id
+//   })
+//   window.navigator.vibrate(500);
+// }
+"use strict";
+'use strict';
+
+app.factory('loading', function () {
+  var loading = false;
+  return {
+    isLoading: function isLoading() {
+      return loading;
+    },
+    start: function start() {
+      loading = true;
+    },
+    finish: function finish() {
+      loading = false;
     }
-  });
-  $('gameId').val();
-}
+  };
+});
+'use strict';
 
-function playAgain() {
-  $('.starting-info').show();
-  $('#win-screen').hide();
-  $('#lose-screen').hide();
-  $('#gameName').text('');
-  $('.waiting').hide();
-}
+app.factory('Player', function ($http, $q, $log, $rootScope, socket, loading) {
+  var _this = this;
 
-function startGame() {
+  var Player = {
+    id: '',
+    name: ''
+  };
 
-  // const name = $('#name').val();
+  Player.getId = function () {
+    return _this.id;
+  };
+  Player.getName = function () {
+    return _this.name;
+  };
 
-  // if (!name) return alert('You must tell me who you are!');
+  return Player;
+});
+'use strict';
 
-  window.addEventListener('devicemotion', listener, false);
+app.factory('apiService', function ($http, $q, $log, $rootScope, socket, loading, Player) {
 
-  indicator.addClass('alive').show();
+  return {
+    send: function send(url, data) {
 
-  socket.on('gameover', function (data) {
-    window.removeEventListener('devicemotion', listener, false);
-    console.log(data);
-    console.log(socket.id);
-    var winner = data.winner;
-    var won = isWinner(data);
-    if (won) {
-      winner = 'YOU';
-      $('#win-screen').show();
-    } else {
-      $('#lose-screen').show();
+      var deferred = $q.defer();
+
+      loading.start();
+
+      var params = data ? data : {};
+
+      params.name = Player.name;
+      params.playerId = Player.id;
+
+      localStorage.playerName = Player.name;
+
+      $http.post(url, params).then(function (resp) {
+        loading.finish();
+        deferred.resolve(resp.data);
+      }, function (err) {
+        loading.finish();
+        alert(err.data.message);
+        deferred.reject();
+      });
+
+      return deferred.promise;
     }
-    indicator.removeClass('alive').removeClass('loser').text('').hide();
-  });
-}
+  };
+});
+'use strict';
 
-function isWinner(data) {
-  return data.winnerId === socket.id;
-}
+app.factory('socket', function ($rootScope) {
+  var socket = io.connect();
+  return {
+    on: function on(eventName, callback) {
+      socket.on(eventName, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          callback.apply(socket, args);
+        });
+      });
+    },
+    emit: function emit(eventName, data, callback) {
+      socket.emit(eventName, data, function () {
+        var args = arguments;
+        $rootScope.$apply(function () {
+          if (callback) {
+            callback.apply(socket, args);
+          }
+        });
+      });
+    },
+    getId: function getId() {
+      return socket.id;
+    }
+  };
+});
+// app.controller('baseCtrl',
+//   ($scope, $rootScope, $state, $stateParams, socket, apiService) => {
 
-function listener(ev) {
-  if (!ev.acceleration) return;
-  var acc = ev.acceleration;
-  jogHandler(acc.x, acc.y, acc.z);
-}
+//     console.log('starting controller')
 
-function jogHandler(x, y, z) {
-  var arr = [x, y, z];
-  if (arr.filter(overTheLimit).length > 0) {
-    lose(listener);
-  }
-}
+//     $scope.newGame = function() {
+//       const url = '/room/new';
+//       apiService.send(url)
+//         .then(data => {
+//           if (data.error) {
+//             return alert(data.error)
+//           }
 
-function overTheLimit(coord) {
-  if (coord > LIMIT) {
-    return true;
-  }
-  return false;
-}
+//           alert('success!', JSON.stringify(data))
+//         })
+//     }
 
-function lose() {
-  window.removeEventListener('devicemotion', listener, false);
-  indicator.removeClass('alive').addClass('loser').text('LOSER');
-  socket.emit('loser', {
-    id: socket.id
-  });
-  window.navigator.vibrate(500);
-}
+//     $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+//       console.log('in $stateChangeStart');
+//     })
+//     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
+//       console.log('in $stateChangeSuccess');
+//     })
+//     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams){
+//       console.log('in $stateChangeError');
+//     })
+
+//     $rootScope.playerName = localStorage.name || '';
+//     $rootScope.playerId = 'Connecting to server...';
+//     $rootScope.testing = 'rootScope visible';
+
+//     socket.on('connect', () => {
+//       console.log('connected');
+//       $rootScope.playerId = socket.getId();
+//     })
+
+//   })
+
+// angular.module('pebble-bash').config(function (
+//   $stateProvider,
+//   $urlRouterProvider
+// ) {
+
+//   // Default route is base
+//   $urlRouterProvider.otherwise('/');
+
+//   $stateProvider
+//     .state('base', {
+//       url: '/:roomId',
+//       controller: 'baseCtrl',
+//       templateUrl: 'base.html'
+//     });
+// });
+"use strict";
+
 //# sourceMappingURL=client.js.map

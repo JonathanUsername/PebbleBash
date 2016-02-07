@@ -3,6 +3,7 @@ import Path from 'path';
 import ejs from 'ejs';
 import Hapi from 'hapi';
 import logger from 'winston';
+import Boom from 'boom';
 import socket from './socket.js'
 import {getPlayer, Player} from './player.js'
 import {getRoom, Room} from './room.js'
@@ -29,9 +30,21 @@ server.register(require('inert'), (err) => {
     method: 'POST',
     path: '/room/{gameName}',
     handler: function (request, reply) {
+      const mustHaves = [{ name: 'Game name', item: request.params.gameName }, 
+                        { name: 'Player ID', item: request.payload.playerId },
+                        { name: 'Player Name', item: request.payload.name }];
+
+      const missing = mustHaves.filter(i => !i.item);
+      console.log(mustHaves.map(i => i.item))
+      if (missing.length > 0) {
+        return reply(Boom.badRequest(`Missing required options: ${missing.map(i => i.name).join(', ')}`));
+      }
+
       const gameName = request.params.gameName.toLowerCase().trim();
       const playerId = request.payload.playerId
       const playerName = request.payload.name
+
+      if (!request.params.gameName || request.payload.playerId || request.payload.name)
 
       logger.info(`Requested game ${playerId}`);
       const player = getPlayer(playerId)
