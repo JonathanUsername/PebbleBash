@@ -11,6 +11,7 @@ p {
 
 .section {
     margin: 10px 0 20px 0;
+    text-align: center;
 }
 
 .win {
@@ -103,4 +104,13 @@ p {
     font-size: 30px;
     text-shadow: 2px 2px 5px black;
     font-weight: bold;
+}
+
+.other-user {
+    margin: 5px auto;
+    max-width: 300px;
+}
+
+.other-user.ready {
+    background-color: lightgreen;
 }

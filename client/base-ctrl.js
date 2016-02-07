@@ -11,7 +11,8 @@ app.controller('baseCtrl',
       $state.go('base.room', {
         roomId: 'new'
       }, {
-        reload: true
+        reload: true, // Not sure this is needed
+        location: false
       })
     }
 

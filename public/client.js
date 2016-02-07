@@ -24,7 +24,8 @@ app.controller('baseCtrl', function ($scope, $rootScope, $state, $stateParams, s
     $state.go('base.room', {
       roomId: 'new'
     }, {
-      reload: true
+      reload: true, // Not sure this is needed
+      location: false
     });
   };
 });
