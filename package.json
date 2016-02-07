@@ -7,8 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "babel --source-maps --out-dir lib/ src --watch",
     "devClient": "babel --source-maps --out-file public/client.js client/ --watch",
-    "postinstall": "babel --out-dir lib/ src/ && babel --out-dir public/ client/ && 
-                    babel --source-maps --out-file public/client.js client/",
+    "postinstall": "babel --out-dir lib/ src/ && babel --source-maps --out-file public/client.js client/",
     "start": "nodemon -w src lib/index.js"
   },
   "engines": {
