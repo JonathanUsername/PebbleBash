@@ -9,11 +9,6 @@ p {
     font-size: 12px;
 }
 
-body {
-    max-width: 500px;
-    width: 100vw;
-}
-
 #canvas {
     width: 200px;
     height: 200px;
@@ -65,18 +60,6 @@ body {
     border: 1px solid #D7DE07;
 }
 
-.button {
-    background: green;
-    border-radius: 5px;
-    border: 2px solid darkgreen;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    display: inline-block;
-    cursor: pointer;
-    margin: 0 auto;
-}
-
 #console {
     width: 100%;
     min-height:200px;
@@ -86,7 +69,71 @@ body {
     display: none;
 }
 
-#startGame {
+#win-screen {
+    background-image: url(https://i.imgur.com/4zd8vo4.jpg);
+}
+
+#lose-screen {
+    background-image: url(http://cdn.hexjam.com/editorial_service/bases/images/000/003/685/xlarge/David-Cameron-Sad.jpg.jpg?1404131443);
+}
+
+.description {
+    margin: 0 auto;
+    text-align: center;
+    max-width: 500px;
+}
+
+.game-start-controls {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.starting-info {
+    width: 100%;
+    max-width: 1000px;
+    padding: 20px;
+    margin: 0 auto;
+}
+
+.game-start-controls input {
+    width: 80%;
+    border: solid 1px grey;
+    border-radius: 5px;
+    padding: 10px 0;
+    text-align: center;
+    margin: 10px auto;
+}
+
+.game-start-controls .button {
+    margin: 10px auto;
+}
+
+.button {
+    background: green;
+    border-radius: 5px;
+    border: 2px solid darkgreen;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    padding: 20px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.half-panel {
+    width:45%;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    border: 1px solid black;
+}
+
+.half-panel {
+    margin: 10px auto;
+    display: inline-block;
+}
+
+.waiting {
     display: none;
 }
 
@@ -105,14 +152,6 @@ body {
     display:none;
     background-size: contain;
     background-repeat: no-repeat;
-}
-
-#win-screen {
-    background-image: url(https://i.imgur.com/4zd8vo4.jpg);
-}
-
-#lose-screen {
-    background-image: url(http://cdn.hexjam.com/editorial_service/bases/images/000/003/685/xlarge/David-Cameron-Sad.jpg.jpg?1404131443);
 }
 
 .loser {
