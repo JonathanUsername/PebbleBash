@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('pebble-bash', ['ui.router']);
+var app = angular.module('pebble-bash', ['ui.router', 'ngSanitize']);
 
 app.run(function ($rootScope, $state, $log, $stateParams, loading) {
   $rootScope.$on('$stateChangeError', $log.log.bind($log));
@@ -225,7 +225,7 @@ app.factory('Player', function ($http, $q, $log, $rootScope, socket, $stateParam
 });
 'use strict';
 
-app.controller('roomCtrl', function ($scope, $state, $location, $stateParams, socket, roomJoined, Player) {
+app.controller('roomCtrl', function ($scope, $state, $location, $stateParams, socket, roomJoined, Player, apiService, $sce) {
 
   console.log('starting room controller');
 
@@ -270,6 +270,18 @@ app.controller('roomCtrl', function ($scope, $state, $location, $stateParams, so
     } else {
       alert('You have no name? How can you win if you have no name??');
     }
+  };
+
+  $scope.svgQR = '';
+
+  $scope.getQR = function () {
+    console.log('getting QR');
+    apiService.send('/qr', {
+      url: $location.absUrl()
+    }).then(function (svg) {
+      console.log(svg);
+      $scope.svgQR = $sce.trustAsHtml(svg);
+    });
   };
 });
 

@@ -1,5 +1,5 @@
 app.controller('roomCtrl', 
-  ($scope, $state, $location, $stateParams, socket, roomJoined, Player) => {
+  ($scope, $state, $location, $stateParams, socket, roomJoined, Player, apiService, $sce) => {
 
     console.log('starting room controller')
 
@@ -45,6 +45,18 @@ app.controller('roomCtrl',
         alert('You have no name? How can you win if you have no name??');
       }
     };
+
+    $scope.svgQR = '';
+
+    $scope.getQR = () => {
+      console.log('getting QR');
+      apiService.send('/qr', {
+        url: $location.absUrl()
+      }).then(svg => {
+        console.log(svg)
+        $scope.svgQR = $sce.trustAsHtml(svg);
+      })
+    }
 
   })
 

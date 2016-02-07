@@ -114,3 +114,8 @@ p {
 .other-user.ready {
     background-color: lightgreen;
 }
+
+.qr-code {
+    max-width: 300px;
+    margin: 5px auto;
+}

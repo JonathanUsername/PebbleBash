@@ -1,4 +1,4 @@
-const app = angular.module('pebble-bash', ['ui.router'])
+const app = angular.module('pebble-bash', ['ui.router', 'ngSanitize'])
 
 app.run((
   $rootScope,

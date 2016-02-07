@@ -6,6 +6,7 @@ import logger from 'winston';
 import Boom from 'boom';
 import socket, { getSocket, socketsInRoom } from './socket.js';
 import Moniker from 'moniker';
+import qr from 'qr-image';
 
 const server = new Hapi.Server();
 
@@ -22,6 +23,16 @@ server.register(require('inert'), (err) => {
     path: '/',
     handler: function (request, reply) {
       reply.file('public/index.html');
+    }
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/qr',
+    handler: function (request, reply) {
+      const url = request.payload.url;
+      logger.info(`Creating SVG sync for ${url}`)
+      reply(qr.imageSync(url, { type: 'svg' }))
     }
   });
 

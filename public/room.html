@@ -15,6 +15,11 @@
     <a ng-href="{{url}}">{{url}}</a>
   </div>
   <div class="section">
+    <p class="label">QR Code:</p>
+    <div ng-click="getQR()" class="button">Get QR Code?</div>
+    <div ng-bind-html="svgQR" class="qr-code"></div>
+  </div>
+  <div class="section">
     <p class="label">Other players in game</p>
     <div ng-repeat="other in others">
       <div class="other-user" ng-class="{ 'ready': other.ready }">{{other.name}}</div>
