@@ -25,11 +25,8 @@ function Messenger () {
         console.log('user disconnected', socket.id);
         socket.leave(socket.room);
         console.log('Currently in room:', socketsInRoom(socket.room, true))
-      });
 
-      socket.on('loser', function(data){
-        console.log('user lost', data.id);
-        socket.loser = true;
+        sendUpdate(socket);
       });
 
       socket.on('join', function(data){
@@ -72,8 +69,22 @@ function Messenger () {
         }
       });
 
+      socket.on('loser', function(){
+        console.log('user lost', socket.name, socket.id);
+        socket.loser = true;
+        checkWinner();
+      });
+
       function checkWinner() {
-        io.sockets.in(socket.room)
+        const allPlayers = socketsInRoom(socket.room);
+        const stillStanding = allPlayers.filter(i => !i.loser);
+        if (stillStanding.length === 1) {
+          console.log('we have a winner!')
+          io.sockets.in(socket.room)
+            .emit('gameover', {
+              winner: reduceSocketInfo(stillStanding[0])
+            });
+        }
       }
 
 
@@ -90,7 +101,7 @@ function sendUpdate(socket) {
     .emit('room-update', others)
 }
 
-function socketsInRoom(roomId, slimVersion) {
+function socketsInRoom(roomId, reduced) {
   const res = [];
   roomId = roomId;
   const room = io.sockets.adapter.rooms[roomId];
@@ -99,19 +110,24 @@ function socketsInRoom(roomId, slimVersion) {
       res.push(io.sockets.adapter.nsp.connected[id]);
     }
   }
-  if (slimVersion) {
-    return res.map(i => { 
+  if (reduced) {
+    return reduceSocketInfo(res)
+  }
+  return res;
+}
+
+function reduceSocketInfo(arr) {
+  if (!arr.length) {
+    arr = [arr];
+  }
+  return arr.map(i => { 
       return {
         name: i.name, 
         ready: i.ready,
         id: i.id
       }
     });
-  }
-  return res;
 }
-
-
 
 function broadcastTo(roomId, event, data) {
   io.sockets.in(roomId).emit(event, data);

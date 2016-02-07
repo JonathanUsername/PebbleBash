@@ -5,7 +5,6 @@ app.controller('roomCtrl',
 
     $scope.others = [];
 
-
     $scope.others = $scope.others.concat(roomJoined.others)
 
     // Update room if new
@@ -16,7 +15,6 @@ app.controller('roomCtrl',
 
     $scope.something = 'yeah';
     $scope.url = $location.absUrl();
-
 
     socket.on('room-update', (others) => {
       console.log('Room update: ', others)
@@ -33,7 +31,7 @@ app.controller('roomCtrl',
 
     socket.on('start', (msg) => {
       console.log('STARTING!', msg)
-      $state.go('base.')
+      $state.go('base.room.play')
     })
 
     $scope.ready = () => {

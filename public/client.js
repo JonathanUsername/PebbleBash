@@ -296,7 +296,7 @@ app.controller('roomCtrl', function ($scope, $rootScope, $state, $location, $sta
 
   socket.on('start', function (msg) {
     console.log('STARTING!', msg);
-    $state.go('base.');
+    $state.go('base.room.play');
   });
 
   $scope.ready = function () {

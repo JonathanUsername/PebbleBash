@@ -64,11 +64,11 @@ p {
     min-height:200px;
 }
 
-#win-screen {
+.win {
     background-image: url(https://i.imgur.com/4zd8vo4.jpg);
 }
 
-#lose-screen {
+.lose {
     background-image: url(http://cdn.hexjam.com/editorial_service/bases/images/000/003/685/xlarge/David-Cameron-Sad.jpg.jpg?1404131443);
 }
 
@@ -144,7 +144,7 @@ p {
     background-repeat: no-repeat;
 }
 
-.loser {
+.dead {
     background: red;
 }
 
