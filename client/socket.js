@@ -1,36 +1,30 @@
-app.factory('socket', function ($rootScope) {
-  var socket = io.connect();
 
-  socket.on('disconnect', () => {
-    console.log('DISCONNECTED FROM SOCKET')
-  })
+const socket = io.connect();
+const rate = 10
+const room = location.search.split('?')[1];
+let counter = 0
 
-  socket.on('message', (data) => {
-    console.log('message:', data)
-  })
+window.addEventListener('deviceorientation', listener, false);
 
-  return {
-    on: function (eventName, callback) {
-      console.log('registering', eventName)
-      socket.on(eventName, function () {  
-        var args = arguments;
-        $rootScope.$apply(function () {
-          callback.apply(socket, args);
-        });
-      });
-    },
-    emit: function (eventName, data, callback) {
-      socket.emit(eventName, data, function () {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          if (callback) {
-            callback.apply(socket, args);
-          }
-        });
-      })
-    },
-    getId: function() {
-      return socket.id;
-    }
-  };
-});
+socket.emit('join', room)
+
+function listener(ev) {
+  if (counter % rate === 0) 
+    counter = 0;
+  else 
+    return;
+
+  const e = {
+    alpha: Math.round(ev.alpha),
+    beta: Math.round(ev.beta),
+    gamma: Math.round(ev.gamma),
+    room
+  }
+
+  let str = '';
+  for (var i in e) {
+    str += `<p>${i}: ${e[i]}</p>`
+  }
+  document.getElementById('console').innerHTML = str
+  socket.emit('movement', e);
+}
